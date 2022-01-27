@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="<% if (language === 'ar') { %>ar<% } else { %>en<%} %>">
+  <head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+
+    <% if (isIOSSafari) { %>
+      <meta name="apple-itunes-app" content="app-id=<%- iOSAppStoreID %>, app-argument=<%- urlPath %>">
+    <% } %>
+
+    <% for (const url of prefetchUrls) { %>
+      <link href="<%= url %>" rel="preconnect" crossorigin>
+    <% } %>
+
+    <% for (const font of preloadFonts) { %>
+      <link rel="preload" href="/static/fonts/<%= font %>?rv=<%- versionHash %>" as="font" crossorigin="anonymous">
+    <% } %>
+
+    <%- helmet.title.toString() %>
+    <%- helmet.meta.toString() %>
+    <%- helmet.link.toString() %>
+
+    <%# The following article was used as a reference for favicons definition %>
+    <%# https://www.emergeinteractive.com/insights/detail/the-essentials-of-favicons/ %>
+
+    <!-- Generics favicons -->
+    <link rel="icon" sizes="32x32" href="/static/images/favicons/favicon-32.png?rv=<%- versionHash %>" />
+    <link rel="icon" sizes="128x128" href="/static/images/favicons/favicon-128.png?rv=<%- versionHash %>" />
+    <link rel="icon" sizes="192x192" href="/static/images/favicons/favicon-192.png?rv=<%- versionHash %>" />
+
+    <!-- Android specific favicons -->
+    <link rel="shortcut icon" sizes="196x196" href="/static/images/favicons/favicon-196.png?rv=<%- versionHash %>" />
+
+    <!-- iOS specific favicons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/images/favicons/favicon-152.png?rv=<%- versionHash %>" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/static/images/favicons/favicon-167.png?rv=<%- versionHash %>" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/favicons/favicon-180.png?rv=<%- versionHash %>" />
+
+    <link rel="alternate" hreflang="x-default" href="<%= urlPath %>" />
+
+    <% if (language !== 'ar') { %>
+      <link rel="stylesheet" href="/build/<%= component %>.css?rv=<%- versionHash %>">
+    <% } else { %>
+      <link rel="stylesheet" href="/build/<%= component %>.rtl.css?rv=<%- versionHash %>">
+    <% } %>
+
+    <style>
+      #stats {
+        font-family: monospace;
+        position: fixed;
+        right: 0px;
+        top: 0px;
+        padding: 10px;
+        background-color: rgba(0,0,0,0.2);
+      }
+    </style>
+  </head>
+
+  <body class="<% if (language === 'ar') { %>rtl<% } %>">
+    <div id="stats">
+      <div>
+        <span>renderToString:</span>
+        <span><%= stats.renderToString %></span>
+      </div>
+
+      <div>
+        <span>stringify:</span>
+        <span><%= stats.stringify %></span>
+      </div>
+
+      <div>
+        <span>stringifyPlusReplace:</span>
+        <span><%= stats.stringifyPlusReplace %></span>
+      </div>
+
+      <div>
+        <span>jsesc:</span>
+        <span><%= stats.jsesc %></span>
+      </div>
+    </div>
+
+    <div id="root"><%- html %></div>
+
+    <!-- escape non ASCII characters from initial react state -->
+    <script type="text/javascript">
+      window.initialState = <%- initialStateStr %>;
+    </script>
+
+    <% if (browser === 'ie' ) { %>
+      <script src='/static/js/polyfill.min.js'></script>
+    <% } %>
+
+    <script>
+      window.lazySizesConfig = window.lazySizesConfig || {};
+      window.lazySizesConfig.preloadAfterLoad = true;
+    </script>
+
+    <%- helmet.script.toString() %>
+    <script src="/frontend/dist/bundle.js"></script>
+  </body>
+</html>
